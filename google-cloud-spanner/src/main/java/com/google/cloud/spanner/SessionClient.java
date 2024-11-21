@@ -402,16 +402,16 @@ class SessionClient implements AutoCloseable {
           String.format(
               "Request for %d sessions returned %d sessions", sessionCount, sessions.size()));
       span.end();
+            boolean isDefaultProjectHost = "default".equals(spanner.getOptions().getProjectId());
       List<SessionImpl> res = new ArrayList<>(sessionCount);
       for (com.google.spanner.v1.Session session : sessions) {
+        String sessionName =
+            isDefaultProjectHost ? "projects/default/".concat(session.getName()) : session.getName();
         res.add(
             new SessionImpl(
                 spanner,
                 new SessionReference(
-                    session.getName(),
-                    session.getCreateTime(),
-                    session.getMultiplexed(),
-                    options)));
+                    sessionName, session.getCreateTime(), session.getMultiplexed(), options)));
       }
       return res;
     } catch (RuntimeException e) {

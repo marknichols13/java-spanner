@@ -61,6 +61,7 @@ import com.google.spanner.v1.PartitionReadRequest;
 import com.google.spanner.v1.ReadRequest;
 import com.google.spanner.v1.RollbackRequest;
 import com.google.spanner.v1.SpannerGrpc;
+import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -220,6 +221,35 @@ public class SpannerOptionsTest {
     for (ServerStreamingCallSettings<?, ?> callSettings : callsWithNoRetry1) {
       assertThat(callSettings.getRetrySettings()).isEqualTo(noRetry1);
     }
+  }
+
+
+  @Test
+  public void testDefaultProjectHost() {
+    SpannerOptions options =
+        SpannerOptions.newBuilder()
+            .setProjectId("default")
+            .setHost("http://localhost:15000")
+            .setChannelConfigurator(ManagedChannelBuilder::usePlaintext)
+            .setCredentials(NoCredentials.getInstance())
+            .build();
+    Spanner spanner = options.getService();
+    String projectID = "default", instanceID = "default", databaseID = "test-db";
+    DatabaseClient dbClient = spanner.getDatabaseClient(DatabaseId.of(projectID, instanceID, databaseID));
+    // Queries the database
+    try {
+      ResultSet resultSet = dbClient.singleUse().executeQuery(Statement.of("SELECT table_name FROM information_schema.tables"));
+      System.out.println("\n\nResults:");
+      // Prints the results
+      while (resultSet.next()) {
+        System.out.printf(resultSet.getString(0) + "\n");
+      }
+    } catch (Exception e) {
+      System.out.println("Error executing query: " + e.getMessage());
+      e.printStackTrace();
+    }
+    assertThat(options.getHost()).isEqualTo("http://localhost:15000");
+    assertThat(options.getEndpoint()).isEqualTo("localhost:15000");
   }
 
   @Test
