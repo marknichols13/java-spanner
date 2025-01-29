@@ -853,7 +853,7 @@ public class SessionPoolOptions {
      * SessionPoolOptions#maxSessions} based on the traffic load. Failing to do so will result in
      * higher latencies.
      */
-    Builder setUseMultiplexedSession(boolean useMultiplexedSession) {
+    public Builder setUseMultiplexedSession(boolean useMultiplexedSession) {
       this.useMultiplexedSession = useMultiplexedSession;
       return this;
     }
@@ -873,7 +873,7 @@ public class SessionPoolOptions {
      * Sets whether the client should use multiplexed session for Partitioned operations or not.
      * This method is intentionally package-private and intended for internal use.
      */
-    Builder setUseMultiplexedSessionPartitionedOps(boolean useMultiplexedSessionPartitionedOps) {
+    public Builder setUseMultiplexedSessionPartitionedOps(boolean useMultiplexedSessionPartitionedOps) {
       this.useMultiplexedSessionPartitionedOps = useMultiplexedSessionPartitionedOps;
       return this;
     }
